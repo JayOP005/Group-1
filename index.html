@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        
+
+#productImage{
+    height: 400px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Create responsive rows */
+    gap: 10px; 
+}
+img {
+    width: 150px;
+    height: 150px;
+}
+#imgContainer{
+    width: 170px;
+    align-content: center;
+    padding-left: 20px;
+    
+}
+.price{
+    font-weight: lighter;
+}
+.buttons{
+    display: grid;
+    grid-template-rows: 30px;
+    grid-template-columns: repeat(6, 120px);
+    gap: 5px;
+}
+h3{
+    margin:0%;
+    padding-top: 5px;
+}
+img:hover{
+    cursor: pointer;
+}
+#imgContainer:hover{
+    background-color: rgb(187, 200, 211);
+}
+
+    </style>
+</head>
+<body>
+    <section class="buttons">
+        <h3 class="categories">categories: </h3>
+        <button class="catButton" id="all">all</button>
+        <button class="catButton" id="mens">men's clothing</button>
+        <button class="catButton" id="jewels">jewelery</button>
+        <button class="catButton" id="gadgets">electronics</button>
+        <button class="class" id="womens">women's clothing</button>
+    </section>
+    
+    <p id="productImage"></p>
+</body>
+<script>
+    fetch('https://fakestoreapi.com/products')
+  .then(response => response.json())
+  .then( data => {
+    console.log(data);
+
+    const productImage = document.getElementById('productImage');  
+    const allProducts = document.getElementById('all');
+    const mens = document.getElementById('mens');
+    const jewels = document.getElementById('jewels');
+    const gadgets = document.getElementById('gadgets');
+    const womens = document.getElementById('womens');
+
+    
+    data.forEach( product => {
+        productImage.innerHTML += `<div id="imgContainer">
+        <img src=${product.image} alt=${product.description}>
+        <h3>${product.title}</h3>
+        <h3 class="price">${product.price}</h3>
+        </div>`;
+
+    })
+
+    mens.addEventListener('click', () => {
+      productImage.innerHTML = '';
+      data.forEach((data) =>{
+        if(data.category === "men's clothing"){
+          productImage.innerHTML += `<div id="imgContainer">
+          <img src=${data.image} alt=${data.description}>
+          <h3>${data.title}</h3>
+          <h3 class="price">${data.price}</h3>
+          </div>`;
+        }
+      })
+
+      jewels.addEventListener('click', () => {
+        productImage.innerHTML = '';
+        data.forEach((data) =>{
+          if(data.category === "jewelery"){
+            productImage.innerHTML += `<div id="imgContainer">
+            <img src=${data.image} alt=${data.description}>
+            <h3>${data.title}</h3>
+            <h3 class="price">${data.price}</h3>
+            </div>`;
+          }
+        })
+    
+      })
+ 
+      all.addEventListener('click', () => {
+        productImage.innerHTML = '';
+        data.forEach((data) =>{
+            productImage.innerHTML += `<div id="imgContainer">
+            <img src=${data.image} alt=${data.description}>
+            <h3>${data.title}</h3>
+            <h3 class="price">${data.price}</h3>
+            </div>`;
+        })
+    
+      })
+
+      gadgets.addEventListener('click', () => {
+        productImage.innerHTML = '';
+        data.forEach((data) =>{
+          if(data.category === "electronics"){
+            productImage.innerHTML += `<div id="imgContainer">
+            <img src=${data.image} alt=${data.description}>
+            <h3>${data.title}</h3>
+            <h3 class="price">${data.price}</h3>
+            </div>`;
+          }
+        })
+    
+      })
+
+      womens.addEventListener('click', () => {
+        productImage.innerHTML = '';
+        data.forEach((data) =>{
+          if(data.category === "women's clothing"){
+            productImage.innerHTML += `<div id="imgContainer">
+            <img src=${data.image} alt=${data.description}>
+            <h3>${data.title}</h3>
+            <h3 class="price">${data.price}</h3>
+            </div>`;
+          }
+        })
+    
+      })
+   })
+ })
+</script>
+</html>
