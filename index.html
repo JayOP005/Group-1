@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         
 
@@ -78,14 +79,26 @@ img:hover{
 </head>
 <section class="buttons">
     <h3 class="categories">Categories:</h3>
-    <button class="catButton" id="all">🛍️ All</button>
-    <button class="catButton" id="mens">👕 Men's Clothing</button>
-    <button class="catButton" id="jewels">💍 Jewelery</button>
-    <button class="catButton" id="gadgets">💻 Electronics</button>
-    <button class="catButton" id="womens">👗 Women's Clothing</button>
+    <button class="catButton" id="all">
+        <i class="fas fa-store"></i> All
+    </button>
+    <button class="catButton" id="mens">
+        <i class="fas fa-male"></i> Men's Clothing
+    </button>
+    <button class="catButton" id="jewels">
+        <i class="fas fa-gem"></i> Jewelry
+    </button>
+    <button class="catButton" id="gadgets">
+        <i class="fas fa-laptop"></i> Electronics
+    </button>
+    <button class="catButton" id="womens">
+        <i class="fas fa-female"></i> Women's Clothing
+    </button>
 
-    <!-- ✅ Checkout button with cart icon -->
-    <button onclick="window.location.href='checkout.html'" class="catButton" id="checkout">🛒 Checkout</button>
+    <!-- ✅ Checkout button -->
+    <button onclick="window.location.href='checkout.html'" class="catButton" id="checkout">
+        <i class="fas fa-shopping-cart"></i> Checkout
+    </button>
 </section>
 
 <p id="productImage"></p>
