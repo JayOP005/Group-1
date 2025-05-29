@@ -42,20 +42,50 @@ img:hover{
 #imgContainer:hover{
     background-color: rgb(187, 200, 211);
 }
+ .catButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    margin: 8px 5px;
+    border: none;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Segoe UI', sans-serif;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.catButton:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+#checkout {
+    background-color: #2ecc71; /* green */
+    font-weight: bold;
+}
+
+#checkout:hover {
+    background-color: #27ae60;
+}
+
 
     </style>
 </head>
-<body>
-   <section class="buttons">
-    <h3 class="categories">categories: </h3>
-    <button class="catButton" id="all">all</button>
-    <button class="catButton" id="mens">men's clothing</button>
-    <button class="catButton" id="jewels">jewelery</button>
-    <button class="catButton" id="gadgets">electronics</button>
-    <button class="catButton" id="womens">women's clothing</button>
+<section class="buttons">
+    <h3 class="categories">Categories:</h3>
+    <button class="catButton" id="all">🛍️ All</button>
+    <button class="catButton" id="mens">👕 Men's Clothing</button>
+    <button class="catButton" id="jewels">💍 Jewelery</button>
+    <button class="catButton" id="gadgets">💻 Electronics</button>
+    <button class="catButton" id="womens">👗 Women's Clothing</button>
 
-    <!-- ✅ New Checkout Button -->
-    <button onclick="window.location.href='Index.html'" class="catButton" id="checkout">Checkout</button>
+    <!-- ✅ Checkout button with cart icon -->
+    <button onclick="window.location.href='checkout.html'" class="catButton" id="checkout">🛒 Checkout</button>
 </section>
 
 <p id="productImage"></p>
