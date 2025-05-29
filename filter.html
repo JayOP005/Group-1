@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Store Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+        }
+        .filter-container {
+            width: 20%;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .price-range {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 10px;
+        }
+        .price-range label {
+            margin-right: 1px;
+            font-weight: bold;
+        }
+        span {
+            text-align: right;
+            font-weight: bold;
+        }
+        #products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        .product-card h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            height: 3em; /* Limit title height */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-card p {
+            font-size: 1em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .product-card .price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .loading {
+            text-align: center;
+            font-size: 1.5em;
+            color: #555;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="filter-container">
+        <h4>Filter by Price</h4>
+        <div>
+            <label for="min-price">Min Price:</label>
+            <span id="min-price-display">0</span>
+            <input style="width: 15%;" type="" id="min-price" min="0" max="1000" value="0" step="1">
+        </div>
+        <div>
+            <label for="max-price">Max Price:</label>
+            <span id="max-price-display">1000</span>
+            <input style="width: 15%;" type="" id="max-price" min="0" max="1000" value="1000" step="1">
+        </div>
+    </div>
+
+    <div id="products-container">
+        <p class="loading">Loading products...</p>
+    </div>
+
+    <script>
+        const API_URL = 'https://fakestoreapi.com/products';
+        let allProducts = [];
+
+        const productsContainer = document.getElementById('products-container');
+        const minPriceInput = document.getElementById('min-price');
+        const maxPriceInput = document.getElementById('max-price');
+        const minPriceDisplay = document.getElementById('min-price-display');
+        const maxPriceDisplay = document.getElementById('max-price-display');
+
+        async function fetchProducts() {
+            try {
+                const response = await fetch(API_URL);                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                allProducts = data;
+                displayProducts(allProducts);
+                updatePriceRangeSliders();
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                productsContainer.innerHTML = '<p class="loading" style="color: red;">Failed to load products. Please try again later.</p>';
+            }      
+        }
+
+        function displayProducts(productsToDisplay) {
+            productsContainer.innerHTML = '';
+
+            if (productsToDisplay.length === 0) {
+                productsContainer.innerHTML = '<p class="loading">No products found for the selected price range.</p>';
+                return;
+            }
+
+            productsToDisplay.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.title}">
+                    <h2>${product.title}</h2>
+                    <p class="category">${product.category}</p>
+                    <p class="price">$${product.price.toFixed(2)}</p>
+                `;
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        function filterProducts() {
+            const minPrice = parseFloat(minPriceInput.value);
+            const maxPrice = parseFloat(maxPriceInput.value);
+
+            if (minPrice > maxPrice) {
+                minPriceInput.value = maxPrice;
+                minPriceDisplay.textContent = maxPrice.toFixed(0);
+                return;
+            }
+
+            const filtered = allProducts.filter(product => {
+                return product.price >= minPrice && product.price <= maxPrice;
+            });
+            displayProducts(filtered);
+        }
+
+        function updatePriceRangeSliders() {
+            if (allProducts.length > 0) {
+                const maxProductPrice = Math.max(...allProducts.map(p => p.price));
+                maxPriceInput.max = Math.ceil(maxProductPrice);
+                maxPriceInput.value = Math.ceil(maxProductPrice);
+                maxPriceDisplay.textContent = Math.ceil(maxProductPrice).toFixed(0);
+            }
+        }
+
+        minPriceInput.addEventListener('input', () => {
+            minPriceDisplay.textContent = parseFloat(minPriceInput.value).toFixed(0);
+            filterProducts();
+        });
+
+        maxPriceInput.addEventListener('input', () => {
+            maxPriceDisplay.textContent = parseFloat(maxPriceInput.value).toFixed(0);
+            filterProducts();
+        });
+
+        fetchProducts();
+    </script>
+</body>
+</html>
