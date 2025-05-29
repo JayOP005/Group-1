@@ -46,16 +46,20 @@ img:hover{
     </style>
 </head>
 <body>
-    <section class="buttons">
-        <h3 class="categories">categories: </h3>
-        <button class="catButton" id="all">all</button>
-        <button class="catButton" id="mens">men's clothing</button>
-        <button class="catButton" id="jewels">jewelery</button>
-        <button class="catButton" id="gadgets">electronics</button>
-        <button class="class" id="womens">women's clothing</button>
-    </section>
-    
-    <p id="productImage"></p>
+   <section class="buttons">
+    <h3 class="categories">categories: </h3>
+    <button class="catButton" id="all">all</button>
+    <button class="catButton" id="mens">men's clothing</button>
+    <button class="catButton" id="jewels">jewelery</button>
+    <button class="catButton" id="gadgets">electronics</button>
+    <button class="catButton" id="womens">women's clothing</button>
+
+    <!-- ✅ New Checkout Button -->
+    <button onclick="window.location.href='checkout.html'" class="catButton" id="checkout">Checkout</button>
+</section>
+
+<p id="productImage"></p>
+
 </body>
 <script>
     fetch('https://fakestoreapi.com/products')
