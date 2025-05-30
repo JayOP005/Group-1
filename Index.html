@@ -1,70 +1,97 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <main id='container'>
-        <aside id='info'>
-            <label for='paymentMethod'>Payment Method</label>
-            <select name='paymentMethod'>
-                <option>Visa</option>
-                <option>MasterCard</option>
-                <option>Airtel Money</option>
-            </select>
+<body class="bg-gray-100 text-gray-800">
+  <main class="max-w-6xl mx-auto p-6 md:flex gap-8 mt-10">
+    
+    <!-- Payment Info -->
+    <section class="w-full md:w-1/2 bg-white p-6 rounded-xl shadow-md">
+      <h2 class="text-2xl font-bold mb-4">Payment Information</h2>
+      <div class="space-y-4">
+        <label class="block">
+          <span class="font-medium">Payment Method</span>
+          <select class="w-full mt-1 border rounded-md p-2">
+            <option>Visa</option>
+            <option>MasterCard</option>
+            <option>Airtel Money</option>
+          </select>
+        </label>
+        <label class="block">
+          <span class="font-medium">Card Number</span>
+          <input type="text" class="w-full border rounded-md p-2 mt-1" placeholder="1234 5678 9012 3456">
+        </label>
+        <label class="block">
+          <span class="font-medium">Cardholder Name</span>
+          <input type="text" class="w-full border rounded-md p-2 mt-1" placeholder="John Doe">
+        </label>
+        <div class="flex gap-4">
+          <label class="block w-1/2">
+            <span class="font-medium">Exp. Date</span>
+            <input type="text" class="w-full border rounded-md p-2 mt-1" placeholder="MM/YY">
+          </label>
+          <label class="block w-1/2">
+            <span class="font-medium">CVV</span>
+            <input type="text" class="w-full border rounded-md p-2 mt-1" placeholder="123">
+          </label>
+        </div>
+        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-md transition">
+          Make Payment
+        </button>
+      </div>
+    </section>
 
-            <!-- Credit Card Number -->
-            <label for='cardNumber'>Credit Card Number</label>
-            <input type='text' name='cardNumber' />
+    <!-- Cart Summary -->
+    <section class="w-full md:w-1/2 bg-white p-6 rounded-xl shadow-md mt-10 md:mt-0">
+      <h2 class="text-2xl font-bold mb-4">Your Order</h2>
+      <div id="cartItems" class="space-y-4"></div>
+      <div class="mt-6 text-right text-xl font-bold text-green-600" id="totalPrice"></div>
+      <button onclick="window.location.href='index.html'" class="w-full mt-6 border border-gray-300 p-3 rounded-md hover:bg-gray-100 transition">
+        Edit Cart
+      </button>
+    </section>
+  </main>
 
-            <!-- Credit Card Holder Name -->
-            <label for='cardholderName'>Cardholder Name</label>
-            <input type='text' name='cardholderName' />
+  <script>
+    const cartItemsContainer = document.getElementById('cartItems');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-            <!-- Expiration Date -->
-            <label for='cardDate'>Expiration Date</label>
-            <input type='text' name='cardDate' />
+    if (cart.length === 0) {
+      cartItemsContainer.innerHTML = '<p class="text-gray-500">Your cart is empty.</p>';
+      totalPriceEl.textContent = '';
+    } else {
+      let total = 0;
+      cart.forEach(product => {
+        total += product.price;
+        const item = document.createElement('div');
+        item.className = 'flex gap-4 items-center animate-fade-in';
+        item.innerHTML = `
+          <img src="${product.image}" class="w-24 h-24 object-cover rounded-md border">
+          <div>
+            <h3 class="text-lg font-semibold">${product.title}</h3>
+            <p class="text-sm text-gray-500">${product.category}</p>
+            <p class="text-lg font-bold text-green-600">$${product.price.toFixed(2)}</p>
+          </div>
+        `;
+        cartItemsContainer.appendChild(item);
+      });
+      totalPriceEl.textContent = `Total: $${total.toFixed(2)}`;
+    }
+  </script>
 
-            <!-- CVV Card Number -->
-            <label for='cvv'>CVV</label>
-            <input type='text' name='cvv' />
-
-            <button id='makePayment'>MAKE A PAYMENT</button>
-        </aside>
-        <aside id='description'>
-<h2 id="productTitle"></h2>
-<h3 id="productSubtitle"></h3>
-<img id="productImage" src="" alt="Selected Product">
-<h1 id="productPrice"></h1>
-          <button id='editOrder'>Edit the Order</button>
-        </aside>
-    </main>
-    <script>
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-  const description = document.getElementById('description');
-  if (cart.length === 0) {
-    description.innerHTML = '<h2>Your cart is empty.</h2>';
-  } else {
-    cart.forEach(product => {
-      const item = document.createElement('div');
-      item.innerHTML = `
-        <h2>${product.title}</h2>
-        <p>${product.category}</p>
-        <img src="${product.image}" style="width:150px;">
-        <h3>$${product.price}</h3>
-        <hr />
-      `;
-      description.appendChild(item);
-    });
-  }
-</script>
-
+  <style>
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fade-in 0.4s ease forwards;
+    }
+  </style>
 </body>
 </html>
-
-
