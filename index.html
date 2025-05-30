@@ -113,7 +113,6 @@
       <button data-category="electronics">Electronics</button>
       <button data-category="jewelery">Jewelry</button>
       <button onclick="window.location.href='https://calvinspespe.github.io/Checkoutpage/'" class="catButton" id="checkout">Checkout</button>
-</section>
     </div>
 
     <div class="filter-container">
@@ -161,19 +160,12 @@
     }
 
     function displayProducts(products) {
-      card.innerHTML = `
-  <img src="${product.image}" alt="${product.title}">
-  <h2>${product.title}</h2>
-  <p>${product.category}</p>
-  <p class="price">$${product.price.toFixed(2)}</p>
-  <button onclick='goToCheckout(${JSON.stringify(product)})'>Buy Now</button>
-`;
-      }
-    function goToCheckout(product) {
-  localStorage.setItem('checkoutProduct', JSON.stringify(product));
-  window.location.href = 'checkout.html';
-}
+      productsContainer.innerHTML = ''; // Clear old products
 
+      if (products.length === 0) {
+        productsContainer.innerHTML = '<p class="loading">No products found.</p>';
+        return;
+      }
 
       products.forEach(product => {
         const card = document.createElement('div');
@@ -183,9 +175,15 @@
           <h2>${product.title}</h2>
           <p>${product.category}</p>
           <p class="price">$${product.price.toFixed(2)}</p>
+          <button onclick='goToCheckout(${JSON.stringify(product)})'>Buy Now</button>
         `;
         productsContainer.appendChild(card);
       });
+    }
+
+    function goToCheckout(product) {
+      localStorage.setItem('checkoutProduct', JSON.stringify(product));
+      window.location.href = 'checkout.html';
     }
 
     function updatePriceRange() {
