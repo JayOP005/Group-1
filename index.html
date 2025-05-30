@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fake Store Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FakeStore Products with Cart</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,41 +21,13 @@
       margin-bottom: 20px;
       flex-wrap: wrap;
       justify-content: center;
-    }
-    .filter-container {
-      padding: 15px;
-      background-color: #fff;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
       align-items: center;
     }
-    .category-buttons {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .category-buttons button {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      background-color: #0056b3;
-      color: #fff;
-      cursor: pointer;
-    }
-    .category-buttons button:hover {
-      background-color: #003d80;
-    }
-    .price-range {
-      margin-top: 10px;
-    }
-    .price-range label {
-      margin-right: 5px;
-    }
-    .price-range span {
-      font-weight: bold;
-      margin: 0 5px;
+    select, input[type=number] {
+      font-size: 16px;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
     #products-container {
       display: grid;
@@ -77,159 +49,516 @@
       height: 150px;
       object-fit: contain;
       margin-bottom: 15px;
+      cursor: pointer;
     }
     .product-card h2 {
-      font-size: 1.2em;
+      font-size: 1.1em;
       margin-bottom: 10px;
       height: 3em;
       overflow: hidden;
-    }
-    .product-card p {
-      font-size: 1em;
-      color: #666;
     }
     .price {
       font-size: 1.3em;
       font-weight: bold;
       color: #28a745;
+      margin-bottom: 10px;
     }
-    .loading {
-      text-align: center;
+    .actions {
+      margin-top: auto;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .actions button {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    .actions .buy-now-btn {
+      background-color: #007bff;
+      color: white;
+    }
+    .actions .buy-now-btn:hover {
+      background-color: #0056b3;
+    }
+    .actions .add-to-cart-btn {
+      background-color: #ffc107;
+      color: #333;
+    }
+    .actions .add-to-cart-btn:hover {
+      background-color: #e0a800;
+    }
+
+    /* Modal styles */
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    #modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    #modal-content img {
+      max-width: 100%;
+      height: 250px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+    #modal-content h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    #modal-content p {
+      margin-bottom: 10px;
+      font-size: 1em;
+      color: #555;
+    }
+    #close-modal {
+      position: absolute;
+      right: 15px;
+      top: 10px;
       font-size: 1.5em;
-      margin-top: 50px;
+      font-weight: bold;
+      color: #333;
+      background: none;
+      border: none;
+      cursor: pointer;
     }
+    #close-modal:hover {
+      color: #000;
+    }
+
+    /* Cart Viewer */
+    #cart-viewer {
+      position: fixed;
+      top: 60px;
+      right: 30px;
+      width: 350px;
+      max-height: 70vh;
+      overflow-y: auto;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      display: none;
+      z-index: 2000;
+    }
+    #cart-viewer h2 {
+      margin-top: 0;
+      font-size: 1.5em;
+      color: #0056b3;
+      margin-bottom: 15px;
+    }
+    #cart-items {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .cart-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .cart-item span.title {
+      flex: 1;
+      font-size: 0.9em;
+    }
+    .cart-item span.qty,
+    .cart-item span.price {
+      min-width: 40px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+    .remove-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .remove-btn:hover {
+      background-color: #c82333;
+    }
+    #cart-total {
+      font-weight: bold;
+      font-size: 1.2em;
+      text-align: right;
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+    #view-cart-btn {
+      position: fixed;
+      top: 20px;
+      right: 30px;
+      z-index: 1000;
+      background: #0056b3;
+      color: #fff;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    #close-cart-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 10px;
+      width: 100%;
+    }
+    #close-cart-btn:hover {
+      background-color: #c82333;
+    }
+    #checkout-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    #checkout-btn:hover {
+      background-color: #218838;
+    }
+
   </style>
 </head>
 <body>
 
-  <h1>OP Products</h1>
+  <h1>FakeStore Products</h1>
 
   <div class="controls">
-    <div class="category-buttons">
-      <span><strong>Categories:</strong></span>
-      <button data-category="all">All</button>
-      <button data-category="men's clothing">Men's</button>
-      <button data-category="women's clothing">Women's</button>
-      <button data-category="electronics">Electronics</button>
-      <button data-category="jewelery">Jewelry</button>
-      <button onclick="window.location.href='https://calvinspespe.github.io/Checkoutpage/'" class="catButton" id="checkout">Checkout</button>
-</section>
-    </div>
+    <label for="category-select"><strong>Category:</strong></label>
+    <select id="category-select">
+      <option value="all">All</option>
+      <option value="men's clothing">Men's clothing</option>
+      <option value="women's clothing">Women's clothing</option>
+      <option value="jewelery">Jewelery</option>
+      <option value="electronics">Electronics</option>
+    </select>
 
-    <div class="filter-container">
-      <h4>Filter by Price</h4>
-      <div class="price-range">
-        <label for="min-price">Min:</label>
-        <span id="min-price-display">0</span>
-        <input type="range" id="min-price" min="0" max="1000" value="0" step="1">
-      </div>
-      <div class="price-range">
-        <label for="max-price">Max:</label>
-        <span id="max-price-display">1000</span>
-        <input type="range" id="max-price" min="0" max="1000" value="1000" step="1">
-      </div>
-    </div>
+    <label><strong>Min Price:</strong></label>
+    <input type="number" id="min-price" value="0" min="0" step="1" />
+
+    <label><strong>Max Price:</strong></label>
+    <input type="number" id="max-price" value="1000" min="0" step="1" />
   </div>
 
   <div id="products-container">
-    <p class="loading">Loading products...</p>
+    <p>Loading products...</p>
+  </div>
+
+  <button id="view-cart-btn">View Cart</button>
+
+  <!-- Modal for product details -->
+  <div id="modal">
+    <div id="modal-content">
+      <button id="close-modal" title="Close">&times;</button>
+      <img src="" alt="Product image" id="modal-img" />
+      <h2 id="modal-title"></h2>
+      <p><strong>Category:</strong> <span id="modal-category"></span></p>
+      <p id="modal-description"></p>
+      <p><strong>Price: </strong><span id="modal-price"></span></p>
+      <button id="modal-buy-now-btn">Buy Now</button>
+      <button id="modal-add-to-cart-btn">Add to Cart</button>
+    </div>
+  </div>
+
+  <!-- Cart Viewer -->
+  <div id="cart-viewer">
+    <h2>Your Cart</h2>
+    <div id="cart-items"></div>
+    <p id="cart-total"></p>
+    <button id="checkout-btn">Proceed to Checkout</button>
+    <button id="close-cart-btn">Close</button>
   </div>
 
   <script>
     const API_URL = 'https://fakestoreapi.com/products';
+
     const productsContainer = document.getElementById('products-container');
+    const categorySelect = document.getElementById('category-select');
     const minPriceInput = document.getElementById('min-price');
     const maxPriceInput = document.getElementById('max-price');
-    const minPriceDisplay = document.getElementById('min-price-display');
-    const maxPriceDisplay = document.getElementById('max-price-display');
-    const categoryButtons = document.querySelectorAll('.category-buttons button');
+
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalTitle = document.getElementById('modal-title');
+    const modalCategory = document.getElementById('modal-category');
+    const modalDescription = document.getElementById('modal-description');
+    const modalPrice = document.getElementById('modal-price');
+    const modalBuyNowBtn = document.getElementById('modal-buy-now-btn');
+    const modalAddToCartBtn = document.getElementById('modal-add-to-cart-btn');
+    const closeModalBtn = document.getElementById('close-modal');
+
+    const viewCartBtn = document.getElementById('view-cart-btn');
+    const cartViewer = document.getElementById('cart-viewer');
+    const cartItemsDiv = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+    const closeCartBtn = document.getElementById('close-cart-btn');
+    const checkoutBtn = document.getElementById('checkout-btn');
 
     let allProducts = [];
     let filteredCategory = 'all';
+    let selectedProduct = null;
 
+    // Fetch products and initialize
     async function fetchProducts() {
       try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error('Network error');
         allProducts = await response.json();
 
-        updatePriceRange();
+        setPriceInputLimits();
         filterAndDisplay();
       } catch (err) {
-        productsContainer.innerHTML = `<p class="loading" style="color:red;">Failed to load products.</p>`;
+        productsContainer.innerHTML = `<p style="color:red;">Failed to load products.</p>`;
       }
     }
 
-    function displayProducts(products) {
-      card.innerHTML = `
-  <img src="${product.image}" alt="${product.title}">
-  <h2>${product.title}</h2>
-  <p>${product.category}</p>
-  <p class="price">$${product.price.toFixed(2)}</p>
-  <button onclick='goToCheckout(${JSON.stringify(product)})'>Buy Now</button>
-`;
-      }
-    function goToCheckout(product) {
-  localStorage.setItem('checkoutProduct', JSON.stringify(product));
-  window.location.href = 'checkout.html';
-}
+    // Set min/max for price inputs based on products data
+    function setPriceInputLimits() {
+      const prices = allProducts.map(p => p.price);
+      const minPrice = Math.floor(Math.min(...prices));
+      const maxPrice = Math.ceil(Math.max(...prices));
 
-
-      products.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <img src="${product.image}" alt="${product.title}">
-          <h2>${product.title}</h2>
-          <p>${product.category}</p>
-          <p class="price">$${product.price.toFixed(2)}</p>
-        `;
-        productsContainer.appendChild(card);
-      });
-    }
-
-    function updatePriceRange() {
-      const maxPrice = Math.ceil(Math.max(...allProducts.map(p => p.price)));
-      maxPriceInput.max = maxPrice;
-      maxPriceInput.value = maxPrice;
-      maxPriceDisplay.textContent = maxPrice;
-
+      minPriceInput.min = minPrice;
       minPriceInput.max = maxPrice;
-      minPriceInput.value = 0;
-      minPriceDisplay.textContent = 0;
+      maxPriceInput.min = minPrice;
+      maxPriceInput.max = maxPrice;
+
+      // Reset to default if current values are out of bounds
+      if (+minPriceInput.value < minPrice) minPriceInput.value = minPrice;
+      if (+maxPriceInput.value > maxPrice) maxPriceInput.value = maxPrice;
     }
 
+    // Display products filtered by category and price range
     function filterAndDisplay() {
-      const min = parseFloat(minPriceInput.value);
-      const max = parseFloat(maxPriceInput.value);
+      const minPrice = parseFloat(minPriceInput.value) || 0;
+      const maxPrice = parseFloat(maxPriceInput.value) || 1000;
+      filteredCategory = categorySelect.value;
 
-      const filtered = allProducts.filter(p => {
-        const inPriceRange = p.price >= min && p.price <= max;
+      let filtered = allProducts.filter(p => {
         const inCategory = filteredCategory === 'all' || p.category === filteredCategory;
-        return inPriceRange && inCategory;
+        const inPrice = p.price >= minPrice && p.price <= maxPrice;
+        return inCategory && inPrice;
       });
 
       displayProducts(filtered);
     }
 
-    categoryButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        filteredCategory = button.dataset.category;
-        filterAndDisplay();
+    // Create product cards
+    function displayProducts(products) {
+      productsContainer.innerHTML = '';
+
+      if(products.length === 0) {
+        productsContainer.innerHTML = '<p>No products match the filter.</p>';
+        return;
+      }
+
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.title}" title="Click to view details" />
+          <h2>${product.title}</h2>
+          <p class="price">$${product.price.toFixed(2)}</p>
+          <div class="actions">
+            <button class="buy-now-btn">Buy Now</button>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        `;
+
+        // Open modal on image click
+        card.querySelector('img').addEventListener('click', () => openModal(product));
+
+        // Buy now button - go to checkout
+        card.querySelector('.buy-now-btn').addEventListener('click', () => goToCheckout(product));
+
+        // Add to cart button
+        card.querySelector('.add-to-cart-btn').addEventListener('click', () => addToCart(product));
+
+        productsContainer.appendChild(card);
       });
+    }
+
+    // Open modal with product details
+    function openModal(product) {
+      selectedProduct = product;
+      modalImg.src = product.image;
+      modalTitle.textContent = product.title;
+      modalCategory.textContent = product.category;
+      modalDescription.textContent = product.description;
+      modalPrice.textContent = `$${product.price.toFixed(2)}`;
+      modal.style.display = 'block';
+    }
+
+    // Close modal
+    closeModalBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      selectedProduct = null;
     });
 
+    // Close modal if clicked outside content
+    window.addEventListener('click', e => {
+      if(e.target === modal) {
+        modal.style.display = 'none';
+        selectedProduct = null;
+      }
+    });
+
+    // Buy Now from modal
+    modalBuyNowBtn.addEventListener('click', () => {
+      if (selectedProduct) goToCheckout(selectedProduct);
+    });
+
+    // Add to cart from modal
+    modalAddToCartBtn.addEventListener('click', () => {
+      if (selectedProduct) addToCart(selectedProduct);
+    });
+
+    // Add product to cart
+    function addToCart(product) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const idx = cart.findIndex(item => item.id === product.id);
+      if(idx > -1) {
+        cart[idx].quantity = (cart[idx].quantity || 1) + 1;
+      } else {
+        cart.push({...product, quantity: 1});
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      showCart();
+      cartViewer.style.display = 'block';
+    }
+
+    // Remove product from cart
+    function removeFromCart(id) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart = cart.filter(item => item.id !== id);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      showCart();
+    }
+
+    // Show cart content
+    function showCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if(cart.length === 0) {
+        cartItemsDiv.innerHTML = '<p>Your cart is empty.</p>';
+        cartTotal.textContent = '';
+        checkoutBtn.style.display = 'none';
+        return;
+      }
+
+      checkoutBtn.style.display = 'block';
+      let total = 0;
+      cartItemsDiv.innerHTML = cart.map(item => {
+        total += item.price * item.quantity;
+        return `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.title}" />
+            <span class="title">${item.title}</span>
+            <span class="qty">x${item.quantity}</span>
+            <span class="price">$${(item.price * item.quantity).toFixed(2)}</span>
+            <button class="remove-btn" data-id="${item.id}">Remove</button>
+          </div>
+        `;
+      }).join('');
+      cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+
+      // Add remove event listeners
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = parseInt(e.target.getAttribute('data-id'));
+          removeFromCart(id);
+        });
+      });
+    }
+
+    // Navigate to checkout page
+    function goToCheckout(product = null) {
+      if (product) {
+        // Single product checkout
+        localStorage.setItem('checkoutProduct', JSON.stringify(product));
+      }
+      window.location.href = 'checkout.html'; // Changed from GitHub URL to local file
+    }
+
+    // Toggle cart viewer
+    viewCartBtn.addEventListener('click', () => {
+      if(cartViewer.style.display === 'block') {
+        cartViewer.style.display = 'none';
+      } else {
+        showCart();
+        cartViewer.style.display = 'block';
+      }
+    });
+
+    // Close cart viewer
+    closeCartBtn.addEventListener('click', () => {
+      cartViewer.style.display = 'none';
+    });
+
+    // Checkout button
+    checkoutBtn.addEventListener('click', () => {
+      goToCheckout();
+    });
+
+    // Filter event listeners
+    categorySelect.addEventListener('change', filterAndDisplay);
     minPriceInput.addEventListener('input', () => {
-      minPriceDisplay.textContent = minPriceInput.value;
+      if (+minPriceInput.value > +maxPriceInput.value) {
+        maxPriceInput.value = minPriceInput.value;
+      }
       filterAndDisplay();
     });
-
     maxPriceInput.addEventListener('input', () => {
-      maxPriceDisplay.textContent = maxPriceInput.value;
+      if (+maxPriceInput.value < +minPriceInput.value) {
+        minPriceInput.value = maxPriceInput.value;
+      }
       filterAndDisplay();
     });
 
+    // Initial fetch
     fetchProducts();
+
   </script>
+
 </body>
 </html>
